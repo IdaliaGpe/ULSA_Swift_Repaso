@@ -7,14 +7,14 @@
 
 import Foundation
 
-class Pelicula {
-    var titulo : String
-    var director : String
-    var año : String
+class Pelicula : Decodable {
+    var nombre : String
+    var luz : String
+    var precio : String
     
-    init(titulo: String, director: String, año: String) {
-        self.titulo = titulo
-        self.director = director
-        self.año = año
+    init(nombre: String, luz: String, precio: String) {
+        self.nombre = nombre
+        self.luz = luz
+        self.precio = precio
     }
 }

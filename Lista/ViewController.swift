@@ -26,13 +26,14 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let celda = tableView.dequeueReusableCell(withIdentifier: "celdaPelicula") as! CeldaPeliculaController
-        celda.lblTitulo.text = peliculas[indexPath.row].titulo
-        celda.lblAño.text = peliculas[indexPath.row].año
-        celda.lblDirector.text = peliculas[indexPath.row].director
+        celda.lblTitulo.text = peliculas[indexPath.row].nombre
+        celda.lblAño.text = peliculas[indexPath.row].luz
+        celda.lblDirector.text = peliculas[indexPath.row].precio
         
         return celda
     }
     
+    @IBOutlet weak var tvPelicula: UITableView!
     //Llamamos al modelo
     var peliculas : [Pelicula] = []
     
@@ -40,8 +41,34 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         super.viewDidLoad()
         
         //Llenamos con datos
-        peliculas.append(Pelicula(titulo: "Titanic", director: "James Cameron", año: "1999"))
-        peliculas.append(Pelicula(titulo: "Mario Bros", director: "No se", año: "2023"))
-        peliculas.append(Pelicula(titulo: "Pelicula 3", director: "No se", año: "2000"))
+        //peliculas.append(Pelicula(titulo: "Titanic", director: "James Cameron", año: "1999"))
+        //peliculas.append(Pelicula(titulo: "Mario Bros", director: "No se", año: "2023"))
+        //peliculas.append(Pelicula(titulo: "Pelicula 3", director: "No se", año: "2000"))
+        
+        let url = URL(string:
+                        "http://localhost:8000/api/foco")!
+        
+        var solicitud = URLRequest(url:url)
+        
+        solicitud.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        solicitud.setValue("application/json", forHTTPHeaderField: "Accept")
+        solicitud.httpMethod = "GET"
+        
+        let task = URLSession.shared.dataTask(with: solicitud){
+            data, response, error in
+            if let data = data {
+                if let peliculas = try? JSONDecoder().decode([Pelicula].self, from: data) {
+                    self.peliculas = peliculas
+                    DispatchQueue.global(qos: .background).async {
+                        DispatchQueue.main.async {
+                            self.tvPelicula.reloadData()
+                        }
+                    }
+                    
+                    self.tvPelicula.reloadData()
+                }
+            }
+        }
+        task.resume()
     }
 }
